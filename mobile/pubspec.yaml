@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   webf: ^0.23.0
+  network_manage:
+    path: ../packages/network_manage
 
 dev_dependencies:
   flutter_test:

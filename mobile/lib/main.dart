@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:webf/webf.dart';
+import 'package:network_manage/network_manage.dart';
 
 void main() async {
   // ✅ 确保 Flutter 绑定初始化
   WidgetsFlutterBinding.ensureInitialized();
 
   print('🚀 应用启动');
+
+  // ✅ 测试 network_manage package
+  _testNetworkManage();
 
   // ✅ 初始化 WebFControllerManager（新架构要求）
   WebFControllerManager.instance.initialize(WebFControllerManagerConfig(
@@ -25,6 +29,8 @@ void main() async {
   WebFControllerManager.instance.addWithPreload(
     name: 'wlfi-home',  // Controller 名称
     createController: () => WebFController(
+      // 🎨 设置黑色背景
+      background: Colors.black,
       // ✅ 监听 LCP（最大内容绘制）事件 - 这是页面加载完成的真实指标
       onLCP: (time, isEvaluated) {
         print('✅ 页面加载完成！LCP: ${time}ms, evaluated: $isEvaluated');
@@ -47,7 +53,7 @@ void main() async {
         });
       },
     ),
-    // ✅ 加载远程 URL
+    // ✅ 加载本地开发服务器
     bundle: WebFBundle.fromUrl('http://localhost:5173'),
     // ✅ 可选：Controller 创建后的额外设置
     setup: (controller) {
@@ -56,6 +62,46 @@ void main() async {
   );
 
   runApp(const MyApp());
+}
+
+/// 测试 network_manage package
+void _testNetworkManage() {
+  print('\n========== 🌐 Network Manage 测试 ==========');
+
+  // 1. 获取实例
+  final manager = NetworkManager.getInstance();
+
+  // 2. 加载所有网络
+  final allNetworks = manager.loadNetworks();
+  print('✅ 加载所有网络: ${allNetworks.length} 个');
+
+  // 3. 加载 EVM 网络
+  final evmNetworks = manager.loadNetworks('EVM');
+  print('✅ EVM 网络: ${evmNetworks.length} 个');
+  for (var network in evmNetworks.take(3)) {
+    print('   - ${network.chainName} (chainId: ${network.chainId})');
+  }
+
+  // 4. 获取 Ethereum 详情
+  final ethereum = manager.getNetwork(1);
+  if (ethereum != null) {
+    print('✅ Ethereum 详情:');
+    print('   名称: ${ethereum.chainName}');
+    print('   符号: ${ethereum.nativeCurrencySymbol}');
+    print('   精度: ${ethereum.nativeCurrencyDecimals}');
+  }
+
+  // 5. 获取 Bitcoin
+  final bitcoin = manager.getNetworkByName('BITCOIN');
+  if (bitcoin != null) {
+    print('✅ Bitcoin: ${bitcoin.chainName} (${bitcoin.platformType})');
+  }
+
+  // 6. 获取支持的链类型
+  final chainTypes = manager.getSupportedChainTypes();
+  print('✅ 支持的链类型: ${chainTypes.join(", ")}');
+
+  print('========================================\n');
 }
 
 class MyApp extends StatelessWidget {
@@ -101,22 +147,22 @@ class WebFPage extends StatelessWidget {
       // ✅ 使用新的 fromControllerName API
       body: WebF.fromControllerName(
         controllerName: 'wlfi-home',
-        // ✅ 加载时显示的 Widget
+        // ✅ 加载时显示的 Widget（黑色背景）
         loadingWidget: Container(
-          color: Colors.white,
+          color: Colors.black,
           child: const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
+                CircularProgressIndicator(color: Colors.white),
                 SizedBox(height: 16),
                 Text(
                   '正在加载 WebF 页面...',
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'URL: https://wlfi-points.vercel.app',
+                  'URL: http://localhost:5173',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],

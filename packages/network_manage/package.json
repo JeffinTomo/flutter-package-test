@@ -1,0 +1,35 @@
+{
+  "name": "@tomo/network-manage",
+  "version": "1.0.0",
+  "description": "Blockchain network configuration management for Dart and Node.js",
+  "main": "dist/network_manage.js",
+  "types": "dist/network_manage.d.ts",
+  "scripts": {
+    "build": "./build.sh",
+    "build:quick": "dart compile js lib/network_manage_node.dart -o dist/network_manage.js -O4",
+    "test": "dart test",
+    "test:node": "node test_node.js",
+    "example": "dart run example/example.dart"
+  },
+  "keywords": [
+    "blockchain",
+    "network",
+    "ethereum",
+    "solana",
+    "bitcoin",
+    "web3",
+    "multi-chain"
+  ],
+  "author": "Tomo Team",
+  "license": "MIT",
+  "files": [
+    "dist/**/*",
+    "lib/**/*",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomo-inc/network-manage"
+  }
+}
+
