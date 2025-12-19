@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebF Demo Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4ade80;
+            color: white;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fdf4;
+            border-radius: 10px;
+            color: #166534;
+            display: none;
+        }
+        
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">🚀</div>
+        <h1>WebF Demo Page</h1>
+        <div class="status">✓ 连接成功</div>
+        <p>这是一个运行在 <strong>localhost:5173</strong> 的 WebF 示例页面</p>
+        
+        <div class="info-box">
+            <h3>📱 当前信息</h3>
+            <ul>
+                <li><strong>URL:</strong> <span id="currentUrl">-</span></li>
+                <li><strong>User Agent:</strong> <span id="userAgent">-</span></li>
+                <li><strong>Screen Size:</strong> <span id="screenSize">-</span></li>
+                <li><strong>Time:</strong> <span id="currentTime">-</span></li>
+            </ul>
+        </div>
+        
+        <button onclick="showAlert()">显示提示</button>
+        <button onclick="testInteraction()">测试交互</button>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        // 更新页面信息
+        function updateInfo() {
+            document.getElementById('currentUrl').textContent = window.location.href;
+            document.getElementById('userAgent').textContent = navigator.userAgent.split(' ')[0] + '...';
+            document.getElementById('screenSize').textContent = window.innerWidth + ' x ' + window.innerHeight;
+            document.getElementById('currentTime').textContent = new Date().toLocaleTimeString('zh-CN');
+        }
+        
+        // 显示提示
+        function showAlert() {
+            alert('👋 Hello from WebF!');
+        }
+        
+        // 测试交互
+        function testInteraction() {
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.innerHTML = '✅ 交互测试成功！WebF 正常工作。<br>时间: ' + new Date().toLocaleString('zh-CN');
+        }
+        
+        // 初始化
+        updateInfo();
+        
+        // 每秒更新时间
+        setInterval(() => {
+            document.getElementById('currentTime').textContent = new Date().toLocaleTimeString('zh-CN');
+        }, 1000);
+        
+        console.log('✅ WebF Demo Page loaded successfully!');
+    </script>
+</body>
+</html>
+
