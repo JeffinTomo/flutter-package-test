@@ -265,7 +265,7 @@ function ActivityCard({ icon, iconText, title, progress, status, onClick }: Acti
           </svg>
         ) : (
           <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.875 12.4248L6.64971 6.6501L0.875 0.875393" stroke="#79716B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M0.875 12.4248L6.64971 6.6501L0.875 0.875393" stroke="#79716B" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
 
         )}
