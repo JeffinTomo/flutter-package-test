@@ -6,31 +6,29 @@ import InviteFriends from '../../components/invite-friends';
 import NewUserRequest from '../../components/new-user-request';
 import DailyRequest from '../../components/daily-request';
 import Activities from '../../components/activities';
-import NetworkManageEntry from '../../components/network-manage-entry';
 import { WebFListView } from '../../components/webf-listview';
+import { WebFRouter } from '../../router';
 
 /**
  * design figma link: https://www.figma.com/design/YvaX5joHmqZfcFSsHobQ4W/NEW--WLFI-App?node-id=28824-42024&t=6IxeoGDPoZ08pa6k-0
  */
 export default function HomePage() {
   const [myPointsData, setMyPointsData] = useState<MyPointsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const data = await apiService.getMyPoints();
       setMyPointsData(data);
     } catch (error) {
       console.error('Failed to load my points:', error);
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Load data on mount - common React pattern
+    // eslint-disable-next-line react-compiler/react-compiler
+    void loadData();
+  }, []);
 
   return (
     <WebFListView onRefresh={loadData}>
@@ -45,7 +43,12 @@ export default function HomePage() {
               <NewUserRequest />
               <DailyRequest />
               <Activities />
-              <NetworkManageEntry />
+              <button
+                onClick={() => WebFRouter.push('/network-manage')}
+                className="yellow-button"
+              >
+                <span className="yellow-button-text">Network Manage</span>
+              </button>
             </>
           )}
         </div>
