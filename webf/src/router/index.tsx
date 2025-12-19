@@ -18,5 +18,5 @@ export function AppRoutes() {
 }
 
 // Re-export router utilities for convenience
-export { RouterProvider, WebFRouter, WebFRouterLink, useLocation, useParams, isWebFEnvironment } from './webf-router';
+export { RouterProvider, WebFRouter, WebFRouterLink } from './webf-router';
 

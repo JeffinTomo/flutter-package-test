@@ -1,16 +1,35 @@
 import { useState } from 'react';
-import { NetworkManager, Network } from '@tomo/network-manage';
+import { NetworkManager, type Network } from '@tomo/network-manage';
+import { WebFListView } from '../../components/webf-listview';
+import { WebFRouter } from '../../router';
 
 /**
  * Network Manage 测试页面
  * 用于测试 network_manage 包的功能
  */
 export default function NetworkManagePage() {
-  const [result, setResult] = useState<string>('');
+  const [networks, setNetworks] = useState<Network[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [activeTest, setActiveTest] = useState<string>('');
 
   // 获取 NetworkManager 实例
   const manager = NetworkManager.getInstance();
+
+  const handleBack = () => {
+    WebFRouter.back();
+  };
+
+  const handleRefresh = () => {
+    console.log('Refreshing network data...');
+    // 重新加载当前激活的测试
+    if (activeTest === 'all') {
+      handleLoadAllNetworks();
+    } else if (activeTest === 'evm') {
+      handleLoadEvmNetworks();
+    } else if (activeTest === 'id3') {
+      handleLoadNetworkById3();
+    }
+  };
 
   /**
    * 查询所有网络
@@ -18,16 +37,12 @@ export default function NetworkManagePage() {
   const handleLoadAllNetworks = () => {
     try {
       setLoading(true);
-      const networks = manager.loadNetworks();
-      const resultText = `查询成功！\n\n共找到 ${networks.length} 个网络:\n\n${networks
-        .map(
-          (n: Network) =>
-            `• ${n.name} (Chain ID: ${n.chainId})\n  类型: ${n.platformType}, 符号: ${n.nativeCurrencySymbol}`
-        )
-        .join('\n\n')}`;
-      setResult(resultText);
+      setActiveTest('all');
+      const allNetworks = manager.loadNetworks();
+      setNetworks(allNetworks);
     } catch (error) {
-      setResult(`查询失败: ${error}`);
+      console.error('查询失败:', error);
+      setNetworks([]);
     } finally {
       setLoading(false);
     }
@@ -39,16 +54,12 @@ export default function NetworkManagePage() {
   const handleLoadEvmNetworks = () => {
     try {
       setLoading(true);
-      const networks = manager.loadNetworks('EVM');
-      const resultText = `查询成功！\n\n共找到 ${networks.length} 个 EVM 网络:\n\n${networks
-        .map(
-          (n: Network) =>
-            `• ${n.name} (Chain ID: ${n.chainId})\n  符号: ${n.nativeCurrencySymbol}, RPC: ${n.rpcUrls?.[0] || 'N/A'}`
-        )
-        .join('\n\n')}`;
-      setResult(resultText);
+      setActiveTest('evm');
+      const evmNetworks = manager.loadNetworks('EVM');
+      setNetworks(evmNetworks);
     } catch (error) {
-      setResult(`查询失败: ${error}`);
+      console.error('查询失败:', error);
+      setNetworks([]);
     } finally {
       setLoading(false);
     }
@@ -60,80 +71,577 @@ export default function NetworkManagePage() {
   const handleLoadNetworkById3 = () => {
     try {
       setLoading(true);
+      setActiveTest('id3');
       const network = manager.getNetwork(3);
-      if (network) {
-        const resultText = `查询成功！\n\n找到网络:\n\n• 名称: ${network.name}\n• Chain ID: ${network.chainId}\n• 链名: ${network.chainName}\n• 类型: ${network.platformType}\n• 符号: ${network.nativeCurrencySymbol}\n• 小数位: ${network.nativeCurrencyDecimals}\n• 图标: ${network.icon}\n• 支持交换: ${network.supportSwap ? '是' : '否'}\n• 测试网: ${network.isTestnet ? '是' : '否'}\n• 区块浏览器: ${network.blockExplorerUrl || 'N/A'}`;
-        setResult(resultText);
-      } else {
-        setResult('查询失败: 未找到 Chain ID 为 3 的网络');
-      }
+      setNetworks(network ? [network] : []);
     } catch (error) {
-      setResult(`查询失败: ${error}`);
+      console.error('查询失败:', error);
+      setNetworks([]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="w-full max-w-4xl">
-        {/* 标题 */}
-        <h1 className="text-4xl font-bold text-gray-800 text-center mb-2">
-          Network Manage 测试
-        </h1>
-        <p className="text-gray-600 text-center mb-8">
-          测试 network_manage 包的基本功能
-        </p>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      width: '100%',
+      overflow: 'hidden',
+      background: '#000000'
+    }}>
+      {/* Top Navigation Bar */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px 20px',
+        gap: '8px',
+        width: '100%',
+        height: '48px',
+        boxSizing: 'border-box',
+        flexShrink: 0
+      }}>
+        {/* Back Button - Left */}
+        <div
+          onClick={handleBack}
+          style={{
+            width: '24px',
+            height: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+          className="active:opacity-70 transition-opacity"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="#D9D9D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
 
-        {/* 按钮区域 */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-          <div className="flex flex-col gap-4">
-            {/* 按钮 1: 查询所有网络 */}
+        {/* Title - Center */}
+        <span style={{
+          fontFamily: 'Sora',
+          fontWeight: 600,
+          fontSize: '18px',
+          lineHeight: '140%',
+          display: 'flex',
+          alignItems: 'center',
+          color: '#D9D9D9'
+        }}>
+          Network Manage
+        </span>
+
+        {/* Placeholder - Right (hidden) */}
+        <div style={{
+          width: '24px',
+          height: '24px',
+          visibility: 'hidden',
+          flexShrink: 0
+        }} />
+      </div>
+
+      {/* Content with WebFListView */}
+      <WebFListView
+        onRefresh={handleRefresh}
+        refresh-style="customCupertino"
+        style={{
+          flex: 1,
+          width: '100%',
+          height: 'calc(100vh - 48px)'
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          padding: '24px 20px',
+          gap: '20px',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          {/* Test Buttons Section */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            width: '100%'
+          }}>
+            <span style={{
+              fontFamily: 'Sora',
+              fontWeight: 600,
+              fontSize: '16px',
+              lineHeight: '140%',
+              color: '#D9D9D9',
+              marginBottom: '4px'
+            }}>
+              测试查询
+            </span>
+
+            {/* Button 1: All Networks */}
             <button
               onClick={handleLoadAllNetworks}
               disabled={loading}
-              className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.09)',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s',
+                boxSizing: 'border-box'
+              }}
+              className="active:opacity-70"
             >
-              {loading ? '查询中...' : '📡 查询所有网络 (allNetworks)'}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  background: 'rgba(71, 205, 137, 0.15)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 3V10M10 10V17M10 10H17M10 10H3" stroke="#47CD89" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start'
+                }}>
+                  <span style={{
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    lineHeight: '140%',
+                    color: '#D9D9D9'
+                  }}>
+                    查询所有网络
+                  </span>
+                  <span style={{
+                    fontWeight: 400,
+                    fontSize: '12px',
+                    lineHeight: '140%',
+                    color: '#79716B'
+                  }}>
+                    loadNetworks()
+                  </span>
+                </div>
+              </div>
+              {activeTest === 'all' && !loading && (
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: '#47CD89'
+                }}>
+                  ✓
+                </span>
+              )}
             </button>
 
-            {/* 按钮 2: 查询 EVM 网络 */}
+            {/* Button 2: EVM Networks */}
             <button
               onClick={handleLoadEvmNetworks}
               disabled={loading}
-              className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.09)',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s',
+                boxSizing: 'border-box'
+              }}
+              className="active:opacity-70"
             >
-              {loading ? '查询中...' : '⚡ 查询 EVM 网络 (evmNetworks)'}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  background: 'rgba(138, 99, 210, 0.15)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 2L16 6V14L10 18L4 14V6L10 2Z" stroke="#8A63D2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start'
+                }}>
+                  <span style={{
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    lineHeight: '140%',
+                    color: '#D9D9D9'
+                  }}>
+                    查询 EVM 网络
+                  </span>
+                  <span style={{
+                    fontWeight: 400,
+                    fontSize: '12px',
+                    lineHeight: '140%',
+                    color: '#79716B'
+                  }}>
+                    loadNetworks('EVM')
+                  </span>
+                </div>
+              </div>
+              {activeTest === 'evm' && !loading && (
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: '#47CD89'
+                }}>
+                  ✓
+                </span>
+              )}
             </button>
 
-            {/* 按钮 3: 查询 id=3 的网络 */}
+            {/* Button 3: Network by ID */}
             <button
               onClick={handleLoadNetworkById3}
               disabled={loading}
-              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '16px 20px',
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.09)',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s',
+                boxSizing: 'border-box'
+              }}
+              className="active:opacity-70"
             >
-              {loading ? '查询中...' : '🔍 查询 Chain ID = 3 的网络'}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  background: 'rgba(255, 173, 50, 0.15)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="6" stroke="#FFAD32" strokeWidth="2" fill="none" />
+                    <path d="M10 7V10L12 12" stroke="#FFAD32" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start'
+                }}>
+                  <span style={{
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    lineHeight: '140%',
+                    color: '#D9D9D9'
+                  }}>
+                    查询 Chain ID = 3
+                  </span>
+                  <span style={{
+                    fontWeight: 400,
+                    fontSize: '12px',
+                    lineHeight: '140%',
+                    color: '#79716B'
+                  }}>
+                    getNetwork(3)
+                  </span>
+                </div>
+              </div>
+              {activeTest === 'id3' && !loading && (
+                <span style={{
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: '#47CD89'
+                }}>
+                  ✓
+                </span>
+              )}
             </button>
           </div>
+
+          {/* Results Section */}
+          {networks.length > 0 && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              width: '100%',
+              marginTop: '12px'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span style={{
+                  fontFamily: 'Sora',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  lineHeight: '140%',
+                  color: '#D9D9D9'
+                }}>
+                  查询结果
+                </span>
+                <span style={{
+                  fontWeight: 400,
+                  fontSize: '14px',
+                  color: '#79716B'
+                }}>
+                  共 {networks.length} 个
+                </span>
+              </div>
+
+              {/* Network Items */}
+              {networks.map((network) => (
+                <NetworkItem key={network.chainId} network={network} />
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && networks.length === 0 && activeTest && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px 20px',
+              width: '100%',
+              marginTop: '20px'
+            }}>
+              <span style={{
+                fontWeight: 400,
+                fontSize: '14px',
+                color: '#79716B',
+                textAlign: 'center'
+              }}>
+                未找到网络数据
+              </span>
+            </div>
+          )}
+
+          {/* Initial State */}
+          {!activeTest && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '60px 20px',
+              width: '100%',
+              marginTop: '20px'
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '16px'
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="9" stroke="#79716B" strokeWidth="2" fill="none" />
+                  <path d="M12 8V12L15 15" stroke="#79716B" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <span style={{
+                fontWeight: 400,
+                fontSize: '14px',
+                color: '#79716B',
+                textAlign: 'center'
+              }}>
+                选择上方按钮开始测试
+              </span>
+            </div>
+          )}
+        </div>
+      </WebFListView>
+    </div>
+  );
+}
+
+// Network Item Component
+interface NetworkItemProps {
+  network: Network;
+}
+
+function NetworkItem({ network }: NetworkItemProps) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '16px 20px',
+      width: '100%',
+      background: 'rgba(255, 255, 255, 0.05)',
+      borderRadius: '12px',
+      boxSizing: 'border-box'
+    }}>
+      {/* Left side - Icon + Info */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '12px',
+        flex: 1,
+        minWidth: 0
+      }}>
+        {/* Network Icon */}
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          overflow: 'hidden',
+          flexShrink: 0,
+          background: 'rgba(255, 255, 255, 0.09)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {network.icon ? (
+            <img
+              src={network.icon}
+              alt={network.name}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            <span style={{ color: '#79716B', fontSize: '14px' }}>
+              {network.nativeCurrencySymbol.charAt(0)}
+            </span>
+          )}
         </div>
 
-        {/* 结果显示区域 */}
-        {result && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">查询结果</h2>
-              <button
-                onClick={() => setResult('')}
-                className="text-gray-500 hover:text-gray-700 font-medium"
-              >
-                清除
-              </button>
-            </div>
-            <pre className="bg-gray-50 p-6 rounded-xl overflow-auto max-h-96 text-sm text-gray-700 whitespace-pre-wrap font-mono border border-gray-200">
-              {result}
-            </pre>
+        {/* Network Info */}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          gap: '2px',
+          flex: 1,
+          minWidth: 0
+        }}>
+          <span style={{
+            fontWeight: 600,
+            fontSize: '16px',
+            lineHeight: '140%',
+            color: '#D9D9D9',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            width: '100%'
+          }}>
+            {network.chainName}
+          </span>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span style={{
+              fontWeight: 400,
+              fontSize: '12px',
+              lineHeight: '140%',
+              color: '#79716B'
+            }}>
+              {network.platformType}
+            </span>
+            <span style={{
+              color: '#79716B',
+              fontSize: '12px'
+            }}>
+              •
+            </span>
+            <span style={{
+              fontWeight: 400,
+              fontSize: '12px',
+              lineHeight: '140%',
+              color: '#79716B'
+            }}>
+              ID: {network.chainId}
+            </span>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Right side - Symbol Badge */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '6px 12px',
+        background: 'rgba(71, 205, 137, 0.1)',
+        borderRadius: '8px',
+        flexShrink: 0
+      }}>
+        <span style={{
+          fontWeight: 600,
+          fontSize: '14px',
+          lineHeight: '140%',
+          color: '#47CD89'
+        }}>
+          {network.nativeCurrencySymbol}
+        </span>
       </div>
     </div>
   );

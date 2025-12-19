@@ -2,7 +2,8 @@
   "name": "@tomo/network-manage",
   "version": "1.0.0",
   "description": "Blockchain network configuration management for Dart and Node.js",
-  "main": "dist/network_manage.js",
+  "type": "module",
+  "main": "dist/index.js",
   "types": "dist/network_manage.d.ts",
   "scripts": {
     "build": "./build.sh",
