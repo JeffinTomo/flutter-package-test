@@ -6,6 +6,7 @@ import InviteFriends from '../../components/invite-friends';
 import NewUserRequest from '../../components/new-user-request';
 import DailyRequest from '../../components/daily-request';
 import Activities from '../../components/activities';
+import NetworkManageEntry from '../../components/network-manage-entry';
 import { WebFListView } from '../../components/webf-listview';
 
 /**
@@ -44,6 +45,7 @@ export default function HomePage() {
               <NewUserRequest />
               <DailyRequest />
               <Activities />
+              <NetworkManageEntry />
             </>
           )}
         </div>
