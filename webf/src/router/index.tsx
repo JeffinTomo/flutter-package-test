@@ -1,6 +1,7 @@
 import { Routes, Route } from './webf-router';
 import HomePage from '../pages/home';
 import PointsRecordsPage from '../pages/points-records';
+import NetworkManagePage from '../pages/network-manage';
 
 /**
  * App Routes Configuration
@@ -11,6 +12,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/points-records" element={<PointsRecordsPage />} />
+      <Route path="/network-manage" element={<NetworkManagePage />} />
     </Routes>
   );
 }
