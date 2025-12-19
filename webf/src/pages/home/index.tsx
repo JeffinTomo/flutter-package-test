@@ -6,6 +6,7 @@ import InviteFriends from '../../components/invite-friends';
 import NewUserRequest from '../../components/new-user-request';
 import DailyRequest from '../../components/daily-request';
 import Activities from '../../components/activities';
+import YellowButton from '../../components/yellow-button';
 import { WebFListView } from '../../components/webf-listview';
 import { WebFRouter } from '../../router';
 
@@ -43,12 +44,9 @@ export default function HomePage() {
               <NewUserRequest />
               <DailyRequest />
               <Activities />
-              <button
-                onClick={() => WebFRouter.push('/network-manage')}
-                className="yellow-button"
-              >
-                <span className="yellow-button-text">Network Manage</span>
-              </button>
+              <YellowButton onClick={() => WebFRouter.push('/network-manage')}>
+                Network Manage
+              </YellowButton>
             </>
           )}
         </div>

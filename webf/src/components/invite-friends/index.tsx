@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import YellowButton from '../yellow-button';
 
 export default function InviteFriends() {
   const [friendsReferred] = useState(0);
@@ -113,36 +114,18 @@ export default function InviteFriends() {
       </div>
 
       {/* Middle Section - Invite Button */}
-      <button
+      <YellowButton
         onClick={handleInvite}
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '15px 16px',
-          gap: '8px',
-          width: '100%',
-          height: '50px',
-          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0) 100%), #EAAC08',
-          border: '1px solid #FAC515',
-          boxShadow: 'inset 0px -2px 0px rgba(0, 0, 0, 0.4), inset 0px 2px 0px rgba(255, 255, 255, 0.4)',
-          borderRadius: '12px',
-          cursor: 'pointer',
-          transition: 'transform 0.2s'
-        }}
-        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        width="100%"
+        margin="0"
+        icon={
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.16683 0.833008L16.6668 8.33301L9.16683 15.4163V10.833C3.3335 10.833 0.833496 17.083 0.833496 17.083C0.833496 9.99967 2.91683 5.41634 9.16683 5.41634V0.833008Z" fill="#171412" stroke="#171412" strokeWidth="1.66667" strokeLinejoin="round" />
+          </svg>
+        }
       >
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.16683 0.833008L16.6668 8.33301L9.16683 15.4163V10.833C3.3335 10.833 0.833496 17.083 0.833496 17.083C0.833496 9.99967 2.91683 5.41634 9.16683 5.41634V0.833008Z" fill="#171412" stroke="#171412" strokeWidth="1.66667" strokeLinejoin="round" />
-        </svg>
-
-        <span style={{ fontWeight: 600, fontSize: '16px', lineHeight: '140%', display: 'flex', alignItems: 'center', textAlign: 'center', color: '#171412' }}>
-          Invite friend
-        </span>
-      </button>
+        Invite friend
+      </YellowButton>
 
       {/* Bottom Section - Referral Code Entry & Timer */}
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0px', gap: '8px', width: '295px', height: '48px' }}>
