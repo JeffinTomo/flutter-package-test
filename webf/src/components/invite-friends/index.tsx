@@ -119,12 +119,12 @@ export default function InviteFriends() {
         width="100%"
         margin="0"
         icon={
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9.16683 0.833008L16.6668 8.33301L9.16683 15.4163V10.833C3.3335 10.833 0.833496 17.083 0.833496 17.083C0.833496 9.99967 2.91683 5.41634 9.16683 5.41634V0.833008Z" fill="#171412" stroke="#171412" strokeWidth="1.66667" strokeLinejoin="round" />
-          </svg>
+        </svg>
         }
       >
-        Invite friend
+          Invite friend
       </YellowButton>
 
       {/* Bottom Section - Referral Code Entry & Timer */}

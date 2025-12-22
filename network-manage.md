@@ -1,5 +1,5 @@
 ## 目标
-1. 开发一个独立的 dart packge
+1. 开发一个独立的 dart package
 2. 编译后同步给 flutter 使用
 3. 编译成 node 包 给 typescript 使用
 
